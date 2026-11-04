@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutrition Plan App - Home</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <h2>🥗 Nutrition Plan App</h2>
+    <div class="nav-links">
+      <a href="index.html" class="active">Search & Calculation</a>
+      <a href="tracker.html">Daily Intake Tracker (CRUD)</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Section 1: API Search & Suggestions -->
+    <section class="card">
+      <h3>🔍 Search Food Nutrition (External API)</h3>
+      <p class="subtitle">Search for any food, fruit, or vegetable (e.g., apple, rice, chicken, banana)</p>
+      
+      <div class="search-box">
+        <input type="text" id="foodInput" placeholder="Enter food name...">
+        <select id="dietGoal">
+          <option value="weight_loss">Goal: Weight Loss</option>
+          <option value="muscle_gain">Goal: Muscle Gain</option>
+          <option value="balanced">Goal: Balanced Maintenance</option>
+        </select>
+        <button id="searchBtn">Fetch Nutrition</button>
+      </div>
+
+      <!-- Feedback / Error Handling Messages -->
+      <div id="statusMessage" class="message hidden"></div>
+
+      <!-- Result Card -->
+      <div id="nutritionResult" class="result-grid hidden">
+        <div class="nutri-box">
+          <h4 id="resFoodName">-</h4>
+          <p>Nutritional Values (per 100g):</p>
+          <ul>
+            <li><strong>Calories:</strong> <span id="resCalories">0</span> kcal</li>
+            <li><strong>Protein:</strong> <span id="resProtein">0</span> g</li>
+            <li><strong>Carbohydrates:</strong> <span id="resCarbs">0</span> g</li>
+            <li><strong>Fat:</strong> <span id="resFat">0</span> g</li>
+            <li><strong>Fiber:</strong> <span id="resFiber">0</span> g</li>
+          </ul>
+        </div>
+        
+        <!-- Suggestion Logic Result -->
+        <div class="suggestion-box">
+          <h4>💡 Diet Suggestion Analysis</h4>
+          <div id="suggestionBadge" class="badge">Checking...</div>
+          <p id="suggestionText" class="suggestion-desc"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Meaningful Calculation (BMR & Daily Target) -->
+    <section class="card">
+      <h3>🧮 Daily Calorie & BMR Calculator</h3>
+      <p class="subtitle">Calculate your Basal Metabolic Rate (BMR) and daily calorie intake target</p>
+
+      <form id="calcForm" class="calc-form">
+        <div class="input-group">
+          <label>Gender:</label>
+          <select id="calcGender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Age (years):</label>
+          <input type="number" id="calcAge" min="10" max="100" placeholder="e.g. 20" required>
+        </div>
+
+        <div class="input-group">
+          <label>Weight (kg):</label>
+          <input type="number" id="calcWeight" min="20" max="300" step="0.1" placeholder="e.g. 65" required>
+        </div>
+
+        <div class="input-group">
+          <label>Height (cm):</label>
+          <input type="number" id="calcHeight" min="50" max="250" placeholder="e.g. 170" required>
+        </div>
+
+        <button type="submit" id="calcBtn">Calculate Target</button>
+      </form>
+
+      <div id="calcResult" class="calc-result-box hidden">
+        <h4>Calculation Results:</h4>
+        <p><strong>BMR (Basal Metabolic Rate):</strong> <span id="resBmr">0</span> kcal/day</p>
+        <p><strong>Estimated Daily Needs (TDEE):</strong> <span id="resTdee">0</span> kcal/day</p>
+        <p class="hint">*BMR is the calories burned at rest. TDEE includes daily baseline activities.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="renderer-search.js"></script>
+</body>
+</html>
