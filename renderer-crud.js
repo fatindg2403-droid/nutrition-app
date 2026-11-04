@@ -1,139 +1,108 @@
-// Local Storage Key
-const STORAGE_KEY = 'nutrition_intake_logs';
+// renderer-crud.js
 
-// DOM Elements
-const crudForm = document.getElementById('crudForm');
-const foodNameInput = document.getElementById('foodName');
-const caloriesInput = document.getElementById('calories');
-const mealTypeSelect = document.getElementById('mealType');
-const logDateInput = document.getElementById('logDate');
-const editIndexInput = document.getElementById('editIndex');
-const saveBtn = document.getElementById('saveBtn');
-const cancelEditBtn = document.getElementById('cancelEditBtn');
-const recordsTableBody = document.getElementById('recordsTableBody');
-const trackerStatus = document.getElementById('trackerStatus');
+const logFoodName = document.getElementById('logFoodName');
+const logCalories = document.getElementById('logCalories');
+const logCategory = document.getElementById('logCategory');
+const addLogBtn = document.getElementById('addLogBtn');
+const crudTableBody = document.getElementById('crudTableBody');
+const crudStatus = document.getElementById('crudStatus');
 
-// Set Default Date to Today
-logDateInput.valueToDate = new Date();
-logDateInput.value = new Date().toISOString().substring(0, 10);
+let editIndex = -1;
 
-// Helper Functions for Local Storage
+function showCrudStatus(msg, type = 'info') {
+  if (!crudStatus) return;
+  crudStatus.textContent = msg;
+  crudStatus.className = `message ${type}`;
+  crudStatus.classList.remove('hidden');
+  setTimeout(() => crudStatus.classList.add('hidden'), 3000);
+}
+
 function getRecords() {
-  const records = localStorage.getItem(STORAGE_KEY);
+  const records = localStorage.getItem('nutrition_intake_logs');
   return records ? JSON.parse(records) : [];
 }
 
 function saveRecords(records) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  localStorage.setItem('nutrition_intake_logs', JSON.stringify(records));
 }
 
-// 1. READ: Display records from Local Storage
 function renderRecords() {
+  if (!crudTableBody) return;
   const records = getRecords();
-  recordsTableBody.innerHTML = '';
+  crudTableBody.innerHTML = '';
 
   if (records.length === 0) {
-    recordsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #777;">No food intake records logged yet. Add your first meal above!</td></tr>`;
+    crudTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#8c9ba5;">No records found. Add a meal above!</td></tr>`;
     return;
   }
 
   records.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td style="padding: 10px; border: 1px solid #ddd;">${item.date}</td>
-      <td style="padding: 10px; border: 1px solid #ddd;"><strong>${item.foodName}</strong></td>
-      <td style="padding: 10px; border: 1px solid #ddd;">${item.mealType}</td>
-      <td style="padding: 10px; border: 1px solid #ddd;">${item.calories} kcal</td>
-      <td style="padding: 10px; border: 1px solid #ddd;">
-        <button onclick="editRecord(${index})" style="background-color: #007bff; padding: 5px 10px; font-size: 12px; margin-right: 5px;">Edit</button>
-        <button onclick="deleteRecord(${index})" style="background-color: #dc3545; padding: 5px 10px; font-size: 12px;">Delete</button>
+      <td>${item.date}</td>
+      <td><strong>${item.foodName}</strong></td>
+      <td><span class="badge suitable" style="font-size:0.75rem;">${item.category}</span></td>
+      <td>${item.calories} kcal</td>
+      <td>
+        <button onclick="editRecord(${index})" style="padding: 4px 10px; font-size: 0.78rem; background: #63b3ed; margin-right: 4px;">Edit</button>
+        <button onclick="deleteRecord(${index})" style="padding: 4px 10px; font-size: 0.78rem; background: #fc8181;">Delete</button>
       </td>
     `;
-    recordsTableBody.appendChild(row);
+    crudTableBody.appendChild(row);
   });
 }
 
-// 2. CREATE & 3. UPDATE: Add or Edit Record
-crudForm.addEventListener('submit', (e) => {
-  e.preventDefault();
+if (addLogBtn) {
+  addLogBtn.addEventListener('click', () => {
+    const foodName = logFoodName.value.trim();
+    const calories = parseInt(logCalories.value);
+    const category = logCategory.value;
 
-  const foodName = foodNameInput.value.trim();
-  const calories = parseInt(caloriesInput.value);
-  const mealType = mealTypeSelect.value;
-  const date = logDateInput.value;
-  const editIndex = parseInt(editIndexInput.value);
+    if (!foodName || isNaN(calories) || calories <= 0) {
+      showCrudStatus('Please enter a valid food name and calorie amount.', 'error');
+      return;
+    }
 
-  // Validation
-  if (!foodName || isNaN(calories) || calories < 0 || !date) {
-    showTrackerStatus('Please fill in all required fields with valid values.', 'error');
-    return;
-  }
+    const records = getRecords();
+    const today = new Date().toLocaleDateString('en-GB');
 
-  const records = getRecords();
+    if (editIndex === -1) {
+      records.push({ date: today, foodName, calories, category });
+      showCrudStatus('Meal log added successfully!', 'info');
+    } else {
+      records[editIndex] = { date: today, foodName, calories, category };
+      showCrudStatus('Meal log updated successfully!', 'info');
+      editIndex = -1;
+      addLogBtn.textContent = 'Add to Log';
+    }
 
-  if (editIndex === -1) {
-    // CREATE operation
-    records.push({ foodName, calories, mealType, date });
-    showTrackerStatus('Meal record added successfully!', 'info');
-  } else {
-    // UPDATE operation
-    records[editIndex] = { foodName, calories, mealType, date };
-    showTrackerStatus('Meal record updated successfully!', 'info');
-    resetFormState();
-  }
+    saveRecords(records);
+    logFoodName.value = '';
+    logCalories.value = '';
+    renderRecords();
+  });
+}
 
-  saveRecords(records);
-  renderRecords();
-  crudForm.reset();
-  logDateInput.value = new Date().toISOString().substring(0, 10);
-});
-
-// 3. UPDATE helper: Populate form for editing
 window.editRecord = function(index) {
   const records = getRecords();
-  const record = records[index];
+  const item = records[index];
+  if (!item) return;
 
-  if (record) {
-    foodNameInput.value = record.foodName;
-    caloriesInput.value = record.calories;
-    mealTypeSelect.value = record.mealType;
-    logDateInput.value = record.date;
-    editIndexInput.value = index;
-
-    saveBtn.textContent = 'Update Record';
-    cancelEditBtn.classList.remove('hidden');
-  }
+  logFoodName.value = item.foodName;
+  logCalories.value = item.calories;
+  logCategory.value = item.category || 'Lunch';
+  editIndex = index;
+  addLogBtn.textContent = 'Update Log';
 };
 
-// 4. DELETE: Remove record from Local Storage
 window.deleteRecord = function(index) {
   if (confirm('Are you sure you want to delete this meal record?')) {
     const records = getRecords();
     records.splice(index, 1);
     saveRecords(records);
     renderRecords();
-    showTrackerStatus('Meal record deleted.', 'info');
+    showCrudStatus('Meal record deleted.', 'info');
   }
 };
 
-// Cancel Edit Mode
-cancelEditBtn.addEventListener('click', resetFormState);
-
-function resetFormState() {
-  editIndexInput.value = '-1';
-  saveBtn.textContent = 'Add Meal Record';
-  cancelEditBtn.classList.add('hidden');
-  crudForm.reset();
-  logDateInput.value = new Date().toISOString().substring(0, 10);
-}
-
-function showTrackerStatus(msg, type) {
-  trackerStatus.textContent = msg;
-  trackerStatus.className = `message ${type}`;
-  setTimeout(() => {
-    trackerStatus.className = 'message hidden';
-  }, 3000);
-}
-
-// Initial Load Execution
-renderRecords();
+document.addEventListener('DOMContentLoaded', renderRecords);

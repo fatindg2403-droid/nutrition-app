@@ -3,28 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutrition Plan App - Home</title>
+  <title>NutriPlan - Nutrition & Calorie Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navigation Bar -->
+
+  <!-- Navbar -->
   <nav class="navbar">
-    <h2>🥗 Nutrition Plan App</h2>
+    <h2>NutriPlan</h2>
     <div class="nav-links">
-      <a href="index.html" class="active">Search & Calculation</a>
-      <a href="tracker.html">Daily Intake Tracker (CRUD)</a>
+      <a href="index.html" class="active">Food Search & Calculator</a>
+      <a href="tracker.html">Daily Intake Log (CRUD)</a>
     </div>
   </nav>
 
   <div class="container">
-    <!-- Section 1: API Search & Suggestions -->
-    <section class="card">
-      <h3>🔍 Search Food Nutrition (External API)</h3>
-      <p class="subtitle">Search for any food, fruit, or vegetable (e.g., apple, rice, chicken, banana)</p>
+    <!-- Section 1: Food Search & API -->
+    <div class="card">
+      <h3>🔍 Search Food Nutrition</h3>
+      <p class="subtitle">Search any food item to retrieve macro nutrients & tailored diet suggestions</p>
       
       <div class="search-box">
-        <input type="text" id="foodInput" placeholder="Enter food name...">
-        <select id="dietGoal">
+        <input type="text" id="foodInput" placeholder="Enter food name (e.g., Avocado, Chicken Salad)..." style="flex: 2;">
+        <select id="dietGoal" style="flex: 1;">
           <option value="weight_loss">Goal: Weight Loss</option>
           <option value="muscle_gain">Goal: Muscle Gain</option>
           <option value="balanced">Goal: Balanced Maintenance</option>
@@ -32,71 +33,95 @@
         <button id="searchBtn">Fetch Nutrition</button>
       </div>
 
-      <!-- Feedback / Error Handling Messages -->
-      <div id="statusMessage" class="message hidden"></div>
+      <div id="statusMsg" class="message hidden"></div>
 
-      <!-- Result Card -->
+      <!-- Result Card with Visual Macro Bars -->
       <div id="nutritionResult" class="result-grid hidden">
         <div class="nutri-box">
           <h4 id="resFoodName">-</h4>
-          <p>Nutritional Values (per 100g):</p>
-          <ul>
-            <li><strong>Calories:</strong> <span id="resCalories">0</span> kcal</li>
-            <li><strong>Protein:</strong> <span id="resProtein">0</span> g</li>
-            <li><strong>Carbohydrates:</strong> <span id="resCarbs">0</span> g</li>
-            <li><strong>Fat:</strong> <span id="resFat">0</span> g</li>
-            <li><strong>Fiber:</strong> <span id="resFiber">0</span> g</li>
-          </ul>
+          <p class="subtitle" style="margin-bottom: 12px;">Nutritional breakdown per 100g:</p>
+
+          <div class="macro-bar-group">
+            <div class="macro-item">
+              <div class="macro-label">
+                <span>🔥 Calories</span>
+                <span><strong id="resCalories">0</strong> kcal</span>
+              </div>
+              <div class="progress-bg"><div id="barCalories" class="progress-fill fill-calories" style="width: 0%;"></div></div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label">
+                <span>🥩 Protein</span>
+                <span><strong id="resProtein">0</strong> g</span>
+              </div>
+              <div class="progress-bg"><div id="barProtein" class="progress-fill fill-protein" style="width: 0%;"></div></div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label">
+                <span>🌾 Carbohydrates</span>
+                <span><strong id="resCarbs">0</strong> g</span>
+              </div>
+              <div class="progress-bg"><div id="barCarbs" class="progress-fill fill-carbs" style="width: 0%;"></div></div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label">
+                <span>🥑 Fat</span>
+                <span><strong id="resFat">0</strong> g</span>
+              </div>
+              <div class="progress-bg"><div id="barFat" class="progress-fill fill-fat" style="width: 0%;"></div></div>
+            </div>
+          </div>
         </div>
-        
-        <!-- Suggestion Logic Result -->
+
+        <!-- Suggestion Analysis Card -->
         <div class="suggestion-box">
-          <h4>💡 Diet Suggestion Analysis</h4>
+          <h4 style="color: #2d3748; font-size: 1.05rem;">💡 Diet Suggestion Analysis</h4>
           <div id="suggestionBadge" class="badge">Checking...</div>
           <p id="suggestionText" class="suggestion-desc"></p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Section 2: Meaningful Calculation (BMR & Daily Target) -->
-    <section class="card">
+    <!-- Section 2: BMR & TDEE Calculator -->
+    <div class="card">
       <h3>🧮 Daily Calorie & BMR Calculator</h3>
-      <p class="subtitle">Calculate your Basal Metabolic Rate (BMR) and daily calorie intake target</p>
+      <p class="subtitle">Calculate your Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE)</p>
 
-      <form id="calcForm" class="calc-form">
+      <div class="calc-form">
         <div class="input-group">
-          <label>Gender:</label>
+          <label for="calcGender">Gender</label>
           <select id="calcGender">
-            <option value="male">Male</option>
             <option value="female">Female</option>
+            <option value="male">Male</option>
           </select>
         </div>
 
         <div class="input-group">
-          <label>Age (years):</label>
-          <input type="number" id="calcAge" min="10" max="100" placeholder="e.g. 20" required>
+          <label for="calcAge">Age (years)</label>
+          <input type="number" id="calcAge" placeholder="e.g., 21">
         </div>
 
         <div class="input-group">
-          <label>Weight (kg):</label>
-          <input type="number" id="calcWeight" min="20" max="300" step="0.1" placeholder="e.g. 65" required>
+          <label for="calcWeight">Weight (kg)</label>
+          <input type="number" id="calcWeight" placeholder="e.g., 55">
         </div>
 
         <div class="input-group">
-          <label>Height (cm):</label>
-          <input type="number" id="calcHeight" min="50" max="250" placeholder="e.g. 170" required>
+          <label for="calcHeight">Height (cm)</label>
+          <input type="number" id="calcHeight" placeholder="e.g., 160">
         </div>
-
-        <button type="submit" id="calcBtn">Calculate Target</button>
-      </form>
-
-      <div id="calcResult" class="calc-result-box hidden">
-        <h4>Calculation Results:</h4>
-        <p><strong>BMR (Basal Metabolic Rate):</strong> <span id="resBmr">0</span> kcal/day</p>
-        <p><strong>Estimated Daily Needs (TDEE):</strong> <span id="resTdee">0</span> kcal/day</p>
-        <p class="hint">*BMR is the calories burned at rest. TDEE includes daily baseline activities.</p>
       </div>
-    </section>
+
+      <button id="calcBtn" style="margin-top: 16px; width: 100%;">Calculate Target</button>
+
+      <div id="calcResultBox" class="calc-result-box hidden">
+        <p><strong>Your BMR (Basal Metabolic Rate):</strong> <span id="resBMR">0 kcal/day</span></p>
+        <p><strong>Your Estimated TDEE (Daily Energy Target):</strong> <span id="resTDEE">0 kcal/day</span></p>
+      </div>
+    </div>
   </div>
 
   <script src="renderer-search.js"></script>

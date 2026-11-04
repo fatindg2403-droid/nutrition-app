@@ -3,80 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutrition Plan App - Daily Tracker</title>
+  <title>NutriPlan - Daily Intake Log</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navigation Bar -->
+
+  <!-- Navbar -->
   <nav class="navbar">
-    <h2>🥗 Nutrition Plan App</h2>
+    <h2>NutriPlan</h2>
     <div class="nav-links">
-      <a href="index.html">Search & Calculation</a>
-      <a href="tracker.html" class="active">Daily Intake Tracker (CRUD)</a>
+      <a href="index.html">Food Search & Calculator</a>
+      <a href="tracker.html" class="active">Daily Intake Log (CRUD)</a>
     </div>
   </nav>
 
   <div class="container">
-    <section class="card">
-      <h3>📝 Daily Food Intake Tracker</h3>
-      <p class="subtitle">Manage and persist your daily meals using Local Storage (CRUD)</p>
+    <!-- Log Form Card -->
+    <div class="card">
+      <h3>📝 Log New Food Intake</h3>
+      <p class="subtitle">Add your meals to track your daily calorie intake</p>
 
-      <!-- Form Create / Update -->
-      <form id="crudForm" class="calc-form">
-        <input type="hidden" id="editIndex" value="-1">
-        
-        <div class="input-group">
-          <label>Meal / Food Name:</label>
-          <input type="text" id="foodName" placeholder="e.g. Grilled Chicken Salad" required>
-        </div>
+      <div class="search-box">
+        <input type="text" id="logFoodName" placeholder="Meal / Food Name (e.g. Oatmeal)" style="flex: 2;">
+        <input type="number" id="logCalories" placeholder="Calories (kcal)" style="flex: 1;">
+        <select id="logCategory" style="flex: 1;">
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Dinner">Dinner</option>
+          <option value="Snack">Snack</option>
+        </select>
+        <button id="addLogBtn">Add to Log</button>
+      </div>
+      <div id="crudStatus" class="message hidden"></div>
+    </div>
 
-        <div class="input-group">
-          <label>Calories (kcal):</label>
-          <input type="number" id="calories" min="0" placeholder="e.g. 350" required>
-        </div>
+    <!-- Intake Table Card -->
+    <div class="card">
+      <h3>🥗 Daily Intake Log Records</h3>
+      <p class="subtitle">Saved intake records stored in Local Storage</p>
 
-        <div class="input-group">
-          <label>Meal Time Category:</label>
-          <select id="mealType">
-            <option value="Breakfast">Breakfast</option>
-            <option value="Lunch">Lunch</option>
-            <option value="Dinner">Dinner</option>
-            <option value="Snack">Snack</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Date Logged:</label>
-          <input type="date" id="logDate" required>
-        </div>
-
-        <button type="submit" id="saveBtn">Add Meal Record</button>
-      </form>
-      <button id="cancelEditBtn" class="hidden" style="background-color: #757575; margin-top: 10px;">Cancel Edit</button>
-    </section>
-
-    <!-- Table Read / Local Storage Display -->
-    <section class="card">
-      <h3>📋 Saved Intake History</h3>
-      <p class="subtitle">Records automatically save and persist even if the desktop application is restarted.</p>
-      
-      <div id="trackerStatus" class="message hidden"></div>
-
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+      <table>
         <thead>
-          <tr style="background-color: #e8f5e9; text-align: left;">
-            <th style="padding: 10px; border: 1px solid #ddd;">Date</th>
-            <th style="padding: 10px; border: 1px solid #ddd;">Food Name</th>
-            <th style="padding: 10px; border: 1px solid #ddd;">Meal Type</th>
-            <th style="padding: 10px; border: 1px solid #ddd;">Calories</th>
-            <th style="padding: 10px; border: 1px solid #ddd;">Actions</th>
+          <tr>
+            <th>Date</th>
+            <th>Meal Name</th>
+            <th>Category</th>
+            <th>Calories</th>
+            <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="recordsTableBody">
-          <!-- Dynamically populated via renderer-crud.js -->
+        <tbody id="crudTableBody">
+          <!-- Dynamically populated -->
         </tbody>
       </table>
-    </section>
+    </div>
   </div>
 
   <script src="renderer-crud.js"></script>
